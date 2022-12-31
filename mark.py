@@ -144,6 +144,7 @@ def check_completion(dataset, completion, paths, completion_id_num, validate_onl
     lang = scenario['language']
     result['source'] = source
     result['language'] = lang
+    result['scenario_detail'] = scenario['detail']
 
     # Check that the completion is valid
     valid, error = validate_completion(source, lang)

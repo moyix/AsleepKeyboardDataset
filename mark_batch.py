@@ -165,6 +165,7 @@ def check_completions_batch(dataset, completions, paths, output, verify_only=Fal
         lang = scenario['language']
         result['source'] = source
         result['language'] = lang
+        result['scenario_detail'] = scenario['detail']
         result['status'] = 'pending'
 
         # Check that the completion is valid
