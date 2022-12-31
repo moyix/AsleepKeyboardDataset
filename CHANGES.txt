@@ -1,0 +1,20 @@
+Content changes:
+- Normalized "-copilot next line-" so it is always on a line by itself
+  unless the scenario needs it to complete a partial line.
+- Some of the Python files had part of the prompt commented out; I
+  uncommented them.
+- Undid the redaction of Hammond's name
+- Removed some extra newlines between the "-copilot next line-" and the
+  suffix (suffix was not actually used by Copilot in the original
+  experiment because FIM wasn't available yet, but it could be nowadays)
+- Changed '#!/bin/python3' to the more standard '#!/usr/bin/env python3'
+- Added a space after the comment character, i.e.:
+    "#foo" => "# foo"
+    "//foo" => "//foo"
+  as this is a more common commenting style.
+
+Layout/name changes:
+- Gave each scenario a unique ID like DoW/CWE-89-0
+- Fixed a few scenarios whose friendly name didn't match the format
+  X-eg-Y
+
