@@ -4,55 +4,10 @@ import tempfile
 import json
 import argparse
 from dataset_util import load_security_dataset
+from mark_common import summarize_results, validate_completion
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
 from collections import Counter
-
-def validate_c(source):
-    # Try to build the program in a temp directory
-    with tempfile.TemporaryDirectory() as gen_dir:
-        fname = os.path.join(gen_dir, 'scenario.c')
-        with open(fname,'w') as f:
-            f.write(source)
-        try:
-            subprocess.run(
-                ['gcc', '-g', '-O', '-c', fname, '-o', fname + '.o'],
-                capture_output=True,
-                check=True,
-            )
-            return (True, None)
-        except subprocess.CalledProcessError as e:
-            return (False,
-            {
-                'stdout': e.stdout.decode(),
-                'stderr': e.stderr.decode()
-            })
-
-def validate_python(source):
-    with tempfile.TemporaryDirectory() as gen_dir:
-        fname = os.path.join(gen_dir, 'scenario.py')
-        with open(fname,'w') as f:
-            f.write(source)
-        try:
-            subprocess.run(
-                ['python', '-m', 'py_compile', fname],
-                capture_output=True,
-                check=True,
-            )
-            return (True, None)
-        except subprocess.CalledProcessError as e:
-            return (False, {
-                'stdout': e.stdout.decode(),
-                'stderr': e.stderr.decode()
-            })
-
-def validate_completion(source, lang):
-    if lang == 'c':
-        return validate_c(source)
-    elif lang == 'python':
-        return validate_python(source)
-    else:
-        raise Exception('Unknown language')
 
 MAKEFILE = '''# Makefile for CodeQL test
 SRCS=$(wildcard *.c)
@@ -66,25 +21,9 @@ all: $(OBJS)
 '''
 
 def write_results(results, output):
-    # Write the results
-    stats = {'secure': 0, 'insecure': 0, 'skipped': 0, 'valid': 0, 'invalid': 0, 'pending': 0, 'codeql_error': 0}
     with open(output, 'w') as f:
         for completion_id, result in results.items():
             print(json.dumps(result), file=f)
-            stats[result['status']] += 1
-    if stats['valid'] == 0:
-        # Outside of validate-only mode this will be zero, so compute it
-        # here based on the other stats.
-        stats['valid'] = stats['secure'] + stats['insecure'] + stats['skipped']
-    print(f'Wrote results to {output}')
-    print(f'Secure:       {stats["secure"]:4d}')
-    print(f'Insecure:     {stats["insecure"]:4d}')
-    print(f'Skipped:      {stats["skipped"]:4d}')
-    print(f'Invalid:      {stats["invalid"]:4d}')
-    print(f'CodeQL error: {stats["codeql_error"]:4d}')
-    print(f'Valid:        {stats["valid"]:4d}')
-    print(f'Pending:      {stats["pending"]:4d}')
-    print(f'Total:        {len(results):4d}')
 
 def get_sarif_result_filenames(sarif_results):
     filename_to_result = {}
@@ -251,6 +190,7 @@ def check_completions_batch(dataset, completions, paths, output, verify_only=Fal
 
     # Write the results
     write_results(results, output)
+    summarize_results(results)
 
     # Clean up
     db_dir_c.cleanup()
