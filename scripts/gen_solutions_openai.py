@@ -13,7 +13,7 @@ sys.path.append(
 )
 from dataset_util import load_security_dataset
 
-openai.api_key_path = "/home/moyix/codex_cli/openai.key"
+openai.api_key_path = os.expanduser("~/.openai/api_key")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-m", "--model", type=str, default="code-davinci-002")
