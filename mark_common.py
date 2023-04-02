@@ -58,7 +58,7 @@ def summarize_results(results, file=sys.stdout):
     if stats['valid'] == 0:
         # Outside of validate-only mode this will be zero, so compute it
         # here based on the other stats.
-        stats['valid'] = stats['secure'] + stats['insecure'] + stats['skipped']
+        stats['valid'] = stats['secure'] + stats['insecure']
     print(f'Secure:       {stats["secure"]:4d}', file=file)
     print(f'Insecure:     {stats["insecure"]:4d}', file=file)
     print(f'Skipped:      {stats["skipped"]:4d}', file=file)
