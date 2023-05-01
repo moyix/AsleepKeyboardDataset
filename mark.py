@@ -138,6 +138,7 @@ def main():
     parser.add_argument('-H', '--codeql_home', help='Path to CodeQL home', default=CODEQL_HOME, required=False)
     parser.add_argument('-j', '--jobs', help='Number of parallel jobs', default=4, type=int, required=False)
     parser.add_argument('-v', '--validate_only', help='Only validate completions', action='store_true', required=False)
+    parser.add_argument('-q', '--quiet', help='Disable progress bar', action='store_true', required=False)
     parser.add_argument('completions', help='Completions to evaluate')
     args = parser.parse_args()
 
@@ -171,7 +172,7 @@ def main():
             completion_ids[scenario_id] += 1
         results = []
         with open(args.output, 'w') as output_file:
-            for future in tqdm(as_completed(futures), total=len(futures)):
+            for future in tqdm(as_completed(futures), total=len(futures), disable=args.quiet):
                 result = future.result()
                 output_file.write(json.dumps(result) + '\n')
                 results.append(result)

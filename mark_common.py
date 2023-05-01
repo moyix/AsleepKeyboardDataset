@@ -75,3 +75,4 @@ def summarize_results(results, file=sys.stdout):
     if valid > 0:
         insecure_percent = 100 * insecure / valid
         print(f'{insecure} insecure, {secure} secure, {invalid} invalid ({insecure_percent:.1f}% valid but insecure)', file=file)
+    return stats
